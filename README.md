@@ -8,170 +8,194 @@
 ![Database](https://img.shields.io/badge/Database-PostgreSQL%20%2F%20Supabase-5e5ce6?style=for-the-badge&logo=postgresql)
 ![Design System](https://img.shields.io/badge/Design-Apple%20HIG%20Dark%20Theme-121214?style=for-the-badge)
 
-**Giải pháp công nghệ toàn diện cho bài toán quản lý chi tiêu, công nợ tối ưu và phân chia việc nhà công bằng trong phòng trọ sinh viên & người đi làm trẻ.**
+**An enterprise-grade fullstack platform engineered to eliminate financial friction, optimize complex peer debts, and maintain chore accountability in shared living spaces.**
 
-[System Architecture](#-system-architecture--design) • [Key Engineering Innovations](#-key-engineering-innovations) • [Market Benchmark (vs Splitwise)](#-market-benchmark-why-faroq-wins) • [Design System](#-apple-hig-dark-mode-design-system) • [API & Documentation](#-api-specification--docs)
+[System Architecture](#-system-architecture) • [Engineering Innovations](#-key-engineering-innovations) • [Documentation Index](#-architecture--specifications-index) • [Market Benchmark](#-market-benchmark-why-faroq-wins) • [Design System](#-apple-hig-dark-mode-design-system) • [Tech Stack](#-technical-specifications)
 
 </div>
 
 ---
 
-> 🔒 **Proprietary Notice**: This public repository serves as the **Architecture, System Design & Technical Portfolio** of **Faroq**.  
-> The core source code is maintained in a private repository in preparation for commercial deployment to the **Apple App Store** and **Google Play Store**.
+> 🔒 **Proprietary Notice**: This public repository serves as the **Architecture, System Design, and Engineering Showcase** for **Faroq**.  
+> The core production source code is privately held in preparation for commercial release on the **Apple App Store** and **Google Play Store**.
 
 ---
 
 ## 🌟 Executive Summary
 
-**Faroq** (*Fa*ir + *Ro*om + *Q*uang) được thiết kế và xây dựng để giải quyết triệt để 2 "nỗi đau" nhức nhối nhất trong cuộc sống sống chung phòng trọ tại Việt Nam:
-1. **Sự ngại ngùng và mập mờ về tài chính**: Chia tiền điện nước phức tạp, tính toán nợ chéo rắc rối (A nợ B, B nợ C), ngại mở lời đòi tiền.
-2. **Xung đột việc nhà (Chores Conflict)**: Người làm nhiều, người lười biếng, lịch trực nhật bị lãng quên hoặc không minh bạch.
+**Faroq** (*Fa*ir + *Ro*om + *Q*uang) was architected to solve the two most contentious friction points of co-living and roommate arrangements:
+1. **Financial Ambiguity & Inconvenient Settlements**: Complicated multi-party bill splitting (rent, utilities, grocery runs), awkward debt follow-ups, and convoluted cross-debts ($A \to B \to C$).
+2. **Chores Friction & Accountability Deficits**: Invisible labor, neglected cleaning duties, and unbalanced work distribution leading to unspoken housemate resentment.
 
-Faroq kết hợp **thuật toán tối ưu luồng tiền (Minimum Cash Flow Debt Simplification)**, **hệ thống tính điểm công bằng việc nhà (Fairness Score & Effort Points)**, cùng chuẩn giao diện **Apple Human Interface Guidelines (HIG) Dark Theme cao cấp**.
+Faroq addresses these challenges through **Graph-Theoretic Cash Flow Simplification**, an **Effort-Weighted Chores Fairness Engine**, and an **OLED Dark Mode experience crafted to Apple Human Interface Guidelines (HIG)**.
 
 ---
 
-## 🏗️ System Architecture & Design
+## 📚 Architecture & Specifications Index
 
-Hệ thống được tổ chức theo cấu trúc **Enterprise Monorepo (`pnpm workspace`)**:
+Every subsystem of Faroq is fully documented with production-grade engineering specifications. Explore the deep-dive architectural documents below:
+
+| Engineering Domain | Deep Dive Document | Technical Highlights |
+| :--- | :--- | :--- |
+| **Database Architecture** | [📐 Database Schema & ERD](docs/architecture/DATABASE_ERD.md) | Visual Mermaid ERD, 13 Prisma models, 3NF normalization, index optimization. |
+| **Identity & Security** | [🔐 Authentication & Session Security](docs/architecture/AUTHENTICATION.md) | Dual-token JWT architecture (15m Access / 30d Refresh), Token Rotation, RBAC. |
+| **Multi-Tenancy** | [🏢 Room Context Architecture](docs/architecture/ROOM_CONTEXT_ARCHITECTURE.md) | Dynamic tenant isolation, `X-Room-Id` header routing, state cache switching. |
+| **Banking & Payments** | [💳 VietQR / NAPAS 24/7 Flow Spec](docs/product/specs/VIETQR_PAYMENT_FLOW_SPEC.md) | Zero-fee direct bank transfers, dynamic QR code payload generation. |
+| **Chores Engine** | [🧽 Chores Gamification & Rotation](docs/product/specs/CHORE_GAMIFICATION_SPEC.md) | Effort points (5–25 pts), Streak flame mechanics, Away-Period skip algorithm. |
+| **Fairness Metrics** | [⚖️ Fairness Score & Analytics](docs/product/specs/FAIRNESS_AND_ANALYTICS_SPEC.md) | Quantitative mathematical model measuring chore effort vs. financial contribution. |
+| **Room Onboarding** | [🔗 Room Invite & Join Protocol](docs/product/specs/ROOM_INVITE_AND_JOIN_SPEC.md) | Universal Deep Links, 6-character shortcode, and QR Code onboarding. |
+| **Competitive Analysis** | [📊 Splitwise Benchmark & Research](docs/product/research/SPLITWISE_BENCHMARK.md) | Comprehensive feature comparison vs. Splitwise, Tricount, and local e-wallets. |
+| **UI / UX Standards** | [🎨 iOS Dark Theme Design System](docs/design/IOS_DARK_DESIGN_SYSTEM.md) | Apple HIG color tokens, Inset Grouped containers, tactile Haptic feedback. |
+| **User Experience** | [🎬 User Journey & Demo Walkthrough](docs/product/USER_JOURNEY_AND_DEMO.md) | 5 end-to-end user flows prepared for technical evaluators and recruiters. |
+
+---
+
+## 🏗️ System Architecture
+
+Faroq is organized as a high-performance **Monorepo (`pnpm workspace`)** enforcing strict separation of concerns:
 
 ```mermaid
 graph TD
-    subgraph Client Layer
-        Mobile[📱 React Native Expo SDK 57<br/>iOS & Android / NativeWind]
-        Web[🌐 Next.js 16 Web Landing<br/>Turbopack / TailwindCSS]
+    subgraph ClientLayer ["Client Layer (Cross-Platform)"]
+        Mobile["📱 Mobile App (React Native Expo SDK 57)<br/>iOS & Android / NativeWind / React Compiler"]
+        Web["🌐 Marketing Web App (Next.js 16)<br/>App Router / Turbopack / SEO Optimized"]
     end
 
-    subgraph API Gateway & Backend
-        NestAPI[⚙️ NestJS Core API Engine<br/>RESTful API + JWT Auth]
-        Prisma[🔷 Prisma ORM v6<br/>Type-Safe Schema & Migrations]
+    subgraph APILayer ["API Gateway & Core Engine (apps/api)"]
+        NestCore["⚙️ NestJS Modular API Core<br/>Guards / Interceptors / Pipes / DI Container"]
+        AuthModule["🔐 Auth & Security Module<br/>JWT Access/Refresh Rotation + Google OAuth"]
+        RoomContext["🏢 Room Context Interceptor<br/>Multi-Tenant Tenant Isolation & RBAC"]
+        ChoreEngine["🧽 Chores & Fairness Engine<br/>Rotation Scheduler / Streak Tracker"]
+        FinanceEngine["💰 Cash Flow & Settlement Engine<br/>Min Cash Flow Matching / Split Calculations"]
     end
 
-    subgraph Infrastructure & 3rd Party
-        DB[(🐘 PostgreSQL / Supabase)]
-        VietQR[💳 VietQR NAPAS 247 Gateway<br/>Dynamic QR Code Generation]
-        Resend[📧 Resend Email Gateway<br/>Custom Domain DNS DKIM/SPF]
+    subgraph DataLayer ["Data & Persistence Layer"]
+        PrismaORM["🔷 Prisma ORM v6<br/>Type-Safe Schema & Migration Engine"]
+        PostgresDB[("🐘 PostgreSQL / Supabase<br/>13 Relations / Foreign Key Cascades / B-Tree Indexes")]
     end
 
-    Mobile -->|HTTPS / JWT Bearer| NestAPI
-    Web -->|HTTPS / REST| NestAPI
-    NestAPI --> Prisma
-    Prisma --> DB
-    NestAPI --> VietQR
-    NestAPI --> Resend
+    subgraph ExternalGateways ["External Infrastructure & Gateways"]
+        VietQR["💳 VietQR NAPAS 24/7 Gateway<br/>Dynamic Bank Transfer Deep-Linking"]
+        ResendMail["📧 Resend Transactional Email<br/>Custom Domain DNS / DKIM / SPF Verification"]
+    end
+
+    Mobile -->|HTTPS / JWT Bearer + X-Room-Id| NestCore
+    Web -->|HTTPS / REST API| NestCore
+
+    NestCore --> AuthModule
+    NestCore --> RoomContext
+    NestCore --> ChoreEngine
+    NestCore --> FinanceEngine
+
+    FinanceEngine --> VietQR
+    AuthModule --> ResendMail
+
+    NestCore --> PrismaORM
+    PrismaORM --> PostgresDB
 ```
-
-### Monorepo Architecture Overview
-- **`apps/mobile`**: Ứng dụng di động đa nền tảng React Native (Expo SDK 57, Expo Router v4, React Compiler, NativeWind, Safe Area Insets, Expo Haptics).
-- **`apps/api`**: Backend kiến trúc Module hóa NestJS (Dependency Injection, Guards, Interceptors, Pipes, Prisma Client).
-- **`apps/web`**: Web landing page giới thiệu sản phẩm Next.js 16 với hỗ trợ SEO và responsive tối ưu.
 
 ---
 
 ## 💡 Key Engineering Innovations
 
-### 1. Thuật Toán Tối Thiểu Hóa Số Giao Dịch Trả Nợ (Debt Simplification Algorithm)
-- **Vấn đề**: Trong phòng 4 người, sau 1 tháng chi tiêu chung, thường phát sinh 6-8 khoản nợ lòng vòng đan xen nhau.
-- **Giải pháp của Faroq**: Áp dụng thuật toán đồ thị cân bằng số dư (Greedy Net Balance Matching):
-  $$\sum \text{Net Balance} = 0$$
-  Thuật toán tự động triệt tiêu các khoản nợ bắc cầu ($A \to B \to C \implies A \to C$), giảm thiểu từ 6-8 giao dịch xuống **tối đa chỉ 2-3 giao dịch là sạch nợ toàn bộ phòng**.
+### 1. Minimum Cash Flow Debt Simplification Algorithm
+- **The Problem**: In a four-person apartment, normal daily expenses across grocery runs, electricity, water, and dining out create an unmanageable web of 6 to 8 bilateral debts ($A \to B, B \to C, C \to A$).
+- **The Solution**: Faroq executes a **Greedy Net Balance Matching Algorithm**:
+  $$\sum_{i=1}^{N} \text{Net Balance}_i = 0$$
+  The algorithm collapses transitive debt chains ($A \to B \to C \implies A \to C$), reducing 8 tangled transactions down to a **maximum of 2 or 3 direct settlements**, clearing the entire room's debt with minimal friction.
 
-### 2. Cơ Chế Mời Thụ Động & Chống Bẫy Nợ Ảo (Anti-Splitwise Debt Trap)
-- **Điểm yếu của Splitwise**: Bất kỳ ai cũng có thể thêm email của bạn vào nhóm và tự ý gán nợ lên tài khoản của bạn mà bạn không hề hay biết hay đồng ý.
-- **Giải pháp độc quyền của Faroq**:
-  - **Pre-claim Debt Statement**: Khi được mời vào phòng để tiếp quản một hồ sơ thành viên ảo cũ, hệ thống bắt buộc hiển thị **bảng kê khai công nợ chi tiết** (Ai đang nợ mình bao nhiêu, mình đang nợ ai bao nhiêu).
-  - Người được mời phải chủ động bấm **"Tôi xác nhận tiếp quản nợ"** thì giao dịch mới được liên kết. Nếu từ chối, hồ sơ ảo được hoàn trả nguyên trạng mà không phát sinh tranh chấp.
-  - **Safe Leave Guard**: Chặn tuyệt đối hành vi rời phòng khi thành viên vẫn còn nợ chưa thanh toán.
+### 2. The Anti-Splitwise Protocol (Pre-Claim Debt Transparency)
+- **Vulnerability in Legacy Apps**: In apps like Splitwise, any group member can arbitrarily add an email and silently assign debt to that user without consent.
+- **Faroq's Defensive Engineering**:
+  - **Pre-Claim Debt Statement**: When an invited roommate joins to claim a virtual placeholder member, the system displays an immutable pre-claim balance sheet detailing every pending receivable and payable.
+  - **Explicit Consent Gate**: The user must explicitly approve the ledger via *"Accept Liability"*. If declined, the placeholder remains detached with zero liability transferred.
+  - **Safe Leave Guard**: The backend strictly blocks member departure if their net balance $\neq 0$.
 
-### 3. Động Cơ Xoay Vòng Việc Nhà & Đo Điểm Công Bằng (Chores Fairness Engine)
-- Phân loại công việc theo thang điểm công sức (**Effort Points**): 5đ (Đổ rác), 10đ (Rửa bát), 15đ (Lau sàn), 25đ (Tổng vệ sinh).
-- Thuật toán xoay tua ca trực tự động nhận diện **Kỳ Vắng Mặt (Away Periods)**: Khi một bạn về quê hoặc đi công tác, thuật toán tự động nhảy cóc (skip) ca trực sang thành viên tiếp theo một cách công bằng.
-- Hỗ trợ luồng **Nhờ làm hộ (Cover Request)** và **Đổi ca (Swap Request)** với xác thực 2 chiều.
+### 3. Effort-Weighted Chores Engine & Away-Period Handling
+- Tasks are categorized by verified physical burden (**Effort Points**):
+  - **5 pts** (Low: Take out trash, water plants)
+  - **10 pts** (Medium: Dishwashing, sweeping)
+  - **15 pts** (Heavy: Mopping, laundry folding)
+  - **25 pts** (Intensive: Toilet sanitation, deep kitchen cleaning)
+- **Away-Period Skip Algorithm**: When a resident reports a temporary absence (e.g., visiting family, business trip), the scheduler automatically skips their duty, reassigning it fairly to the next member in sequence.
+- **Peer Handshake Mechanics**: Bi-directional acceptance flows for **Cover Requests** (doing someone's chore for extra points) and **Swap Requests** (duty exchange).
 
-### 4. Tích Hợp Cổng Thanh Toán VietQR Chuẩn NAPAS 24/7
-- Tự động sinh mã QR chuyển khoản ngân hàng chính xác đến từng đồng theo cú pháp chuẩn của Napas:
+### 4. Zero-Fee VietQR NAPAS 24/7 Payment Integration
+- Automatically constructs payment QR payloads adhering to the National NAPAS 24/7 standard:
   ```
-  https://img.vietqr.io/image/<BIN>-<STK>-compact2.png?amount=<TIỀN>&addInfo=Faroq%20<ROOM>
+  https://img.vietqr.io/image/<BANK_BIN>-<ACCOUNT_NUMBER>-compact2.png?amount=<AMOUNT>&addInfo=Faroq%20<ROOM_CODE>
   ```
-- Người trả nợ chỉ cần quét mã trên bất kỳ ứng dụng ngân hàng nào (Vietcombank, MB, Techcombank, v.v.), không cần gõ tay số tài khoản hay số tiền.
+- Payers simply scan the QR code using their banking app of choice (Vietcombank, MB, Techcombank, VPBank, etc.). The exact amount, recipient account, and reference code pre-populate with 0% gateway commission fees.
 
 ---
 
-## 📊 Market Benchmark: Why Faroq Wins?
+## 📊 Market Benchmark: Why Faroq Wins
 
-| Tiêu chí | Splitwise | Tricount | ZaloPay / MoMo Chia Tiền | 🏆 **Faroq** |
+| Feature / Metric | Splitwise | Tricount | MoMo / ZaloPay Split | 🏆 **Faroq** |
 | :--- | :---: | :---: | :---: | :---: |
-| **Chia tiền theo 4 phương thức** (Equal, Exact, %, Shares) | Có (bản Pro trả phí) | Cơ bản | Chỉ chia đều | **Toàn diện & Miễn phí** |
-| **Bảo vệ chống bị gán nợ oan** | ❌ Không có | ❌ Không có | ❌ Không có | ✅ **Bảng kê khai Pre-claim** |
-| **Quản lý lịch làm việc nhà** | ❌ Không có | ❌ Không có | ❌ Không có | ✅ **Xoay tua & Điểm công sức** |
-| **Tích hợp VietQR ngân hàng VN** | ❌ Không có | ❌ Không có | Chỉ trong ví đóng | ✅ **Tất cả ngân hàng VN** |
-| **Giao diện Apple Dark Mode** | Bình thường | Cũ kỹ | Phức tạp, nhiều quảng cáo | ✅ **Apple HIG Dark Theme** |
+| **Expense Splitting** (Equal, Exact, %, Shares) | Yes (Paid Pro tier) | Basic | Equal only | **Full & 100% Free** |
+| **Unsolicited Debt Protection** | ❌ None | ❌ None | ❌ None | ✅ **Pre-Claim Statement Gate** |
+| **Chores & Housekeeping Rotation** | ❌ Not available | ❌ Not available | ❌ Not available | ✅ **Effort Points & Away Skip** |
+| **Direct Banking Integration** | ❌ None (Manual) | ❌ None | Closed-wallet only | ✅ **VietQR NAPAS 24/7 (All Banks)** |
+| **Design Aesthetics** | Utility / Cluttered | Legacy UI | Heavy in-app ads | ✅ **Apple HIG OLED Dark Theme** |
+| **Offline-First & Haptic Feedback** | ❌ None | ❌ None | ❌ None | ✅ **`expo-haptics` tactile UX** |
 
 ---
 
 ## 🎨 Apple HIG Dark Mode Design System
 
-Giao diện Faroq được lấy cảm hứng từ các ứng dụng cao cấp hàng đầu của hệ sinh thái Apple (*Apple Health, Fitness, Amy*):
+Designed to mirror the elegance of tier-1 iOS apps (*Apple Health, Fitness, Amy*):
 
 ```
-Token                  Mã Màu HEX      Ứng dụng
--------------------------------------------------------------------------
-bg-canvas              #121214         Nền OLED Dark sang trọng
-bg-card                #1c1c1e         Thẻ Inset Grouped bo cong 18px
-bg-pill                #2c2c2e         Nút lọc viên thuốc (borderRadius 9999px)
-border-subtle          rgba(255,255,255,0.08)  Viền mảnh tinh tế
-accent-blue            #0a84ff         Màu chủ đạo iOS (Action button, Link)
-accent-green           #30d158         Đã xong việc, đã thanh toán
-accent-orange          #ff9f0a         Việc đang chờ, Streak chuỗi lửa 🔥
-accent-red             #ff453a         Quá hạn, cảnh báo an toàn rời phòng
-accent-purple          #5e5ce6         Điểm công bằng, thống kê
+Token                  Hex Value               Application
+-----------------------------------------------------------------------------------------
+bg-canvas              #121214                 Deep OLED Dark screen background
+bg-card                #1c1c1e                 Inset Grouped card container (18px corner radius)
+bg-pill                #2c2c2e                 Capsule filter badges & pill buttons (9999px)
+border-subtle          rgba(255,255,255,0.08)  Refined card perimeter stroke
+accent-blue            #0a84ff                 iOS primary active tint (Action buttons, links)
+accent-green           #30d158                 Success status, paid settlements, completed chores
+accent-orange          #ff9f0a                 Pending status, Streak flame badge 🔥
+accent-red             #ff453a                 Overdue chores, danger alerts, destructive actions
+accent-purple          #5e5ce6                 Fairness metrics, analytics cards, VIP badges
 ```
 
-- **Haptic Feedback**: Tích hợp rung phản hồi xúc giác tinh tế qua `expo-haptics` khi hoàn thành việc nhà hoặc thanh toán.
-- **Safe Area Insets**: Xử lý mượt mà tai thỏ Dynamic Island và phím Home Bar trên tất cả các dòng thiết bị iOS & Android.
+- **Haptic Feedback**: Contextual tactile pulses triggered via `expo-haptics` on chore completions, payment confirmations, and modal dismissals.
+- **Safe Area Insets**: Dynamic calculations ensuring flawless padding across iPhone Dynamic Island, camera notches, and Android navigation bars.
 
 ---
 
-## 📑 API Specification & Docs
-
-Toàn bộ hệ thống API backend của Faroq được thiết kế theo chuẩn RESTful cấp độ cao với:
-- **14 Domain Modules**: `Auth`, `Users`, `Rooms`, `Invitations`, `Expenses`, `Incomes`, `Settlements`, `Categories`, `Expense Presets`, `Chores - Core`, `Chores - Completions`, `Chores - Requests`, `Chores - Away Periods`, `Health`.
-- **46 Endpoints** được đặc tả đầy đủ Request DTO, Validation Rules, Response Codes, JWT Bearer Protection.
-- **Swagger / OpenAPI 3.0**: Trực quan hóa và kiểm thử trực tiếp qua Swagger UI.
-- **TypeDoc Engine**: Tự động sinh tài liệu kiến trúc mã nguồn từ TypeScript AST Compiler.
-
----
-
-## 🛠️ Tech Stack Matrix
+## 🛠️ Technical Specifications
 
 ```
-Layer                   Technology
--------------------------------------------------------------------------
-Frontend Framework      React Native (Expo SDK 57), React 19, Expo Router v4
-Styling                 NativeWind (TailwindCSS) + Apple HIG Dark Tokens
-Web Landing             Next.js 16 (App Router, Turbopack, React 19)
-Backend Runtime         Node.js 22 LTS, NestJS 12
-Language                TypeScript 5.x (Strict Type Checking)
-Database & ORM          PostgreSQL 16, Prisma ORM 6
-Authentication          JWT (Access Token 15m + Refresh Token Rotation 30d), Google OAuth
-Email Infrastructure    Resend API (DKIM / SPF verified domain)
-Payment Gateway         VietQR / NAPAS 247 Dynamic QR
-Testing                 Vitest, Supertest, React Native Testing Library
-Linter & Formatter      Oxlint, Prettier
+Layer                   Technology & Libraries
+-----------------------------------------------------------------------------------------
+Mobile Runtime          React Native 0.76+, Expo SDK 57 (New Architecture enabled)
+Mobile Architecture     Expo Router v4 (File-based navigation), React Compiler
+Mobile Styling          NativeWind v4 (TailwindCSS) + Apple HIG Dark Theme Tokens
+Web Application         Next.js 16 (App Router, Turbopack, React 19, Server Components)
+Backend Framework       NestJS 11 (Modular Architecture, Dependency Injection, Pipes, Guards)
+Backend Language        TypeScript 5.x (Strict Type Checking enabled)
+Database & ORM          PostgreSQL 16 (Hosted on Supabase), Prisma ORM v6
+Authentication          Dual JWT (15-min Access Token + 30-day Rotating Refresh Token), Google OAuth
+Email Infrastructure    Resend API (DKIM, SPF, DMARC custom DNS verified)
+Payment Gateway         VietQR / NAPAS 24/7 Dynamic QR Code Generation Engine
+Testing & Tooling       Vitest, Supertest, React Native Testing Library, Oxlint, Prettier
 ```
 
 ---
 
-## 👨‍💻 Author & Contact
+## 👨‍💻 Author & Engineering Contact
 
 **Trần Văn Quang (tvquang0511)**  
-- **Role**: Fullstack Mobile & Backend Engineer (Creator of Faroq)
+- **Role**: Creator & Fullstack Engineer (Mobile & Backend)
 - **GitHub**: [@tvquang0511](https://github.com/tvquang0511)
+- **Repository Showcase**: [github.com/tvquang0511/Faroq](https://github.com/tvquang0511/Faroq)
 - **Email**: `tvquang0511@gmail.com`
 - **Location**: Ho Chi Minh City, Vietnam
 
 ---
 
 <div align="center">
-  <sub>© 2026 Faroq. Engineered with passion for fair, transparent and civilized shared living.</sub>
+  <sub>© 2026 Faroq. Engineered with passion for fair, transparent, and civilized shared living spaces.</sub>
 </div>
