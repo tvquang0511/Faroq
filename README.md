@@ -2,6 +2,8 @@
 
 <div align="center">
 
+<img src="docs/assets/banner.jpg" alt="Faroq Banner" width="100%" style="border-radius: 12px; margin-bottom: 16px;" />
+
 ![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-0a84ff?style=for-the-badge&logo=apple)
 ![Framework](https://img.shields.io/badge/Mobile-Expo%20SDK%2057%20%2F%20React%20Native-30d158?style=for-the-badge&logo=expo)
 ![Backend](https://img.shields.io/badge/Backend-NestJS%20%2B%20Prisma%20ORM-ff9f0a?style=for-the-badge&logo=nestjs)
